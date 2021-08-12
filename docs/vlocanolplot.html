@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Wenli Zhou" />
+
+
+<title>好看的火山图</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/sandstone.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">小试牛刀之可视化</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/lily123920/小试牛刀之可视化">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">好看的火山图</h1>
+<h4 class="author">Wenli Zhou</h4>
+<h4 class="date">8-12-2021</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2021-08-12
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>myproject/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20210812code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20210812)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20210812code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20210812)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrong9b32803"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> 9b32803 </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrong9b32803" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version 9b32803. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+
+Untracked files:
+    Untracked:  genes_up_GO.RData
+
+Unstaged changes:
+    Modified:   analysis/_site.yml
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/vlocanolplot.Rmd</code>) and HTML (<code>docs/vlocanolplot.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+9b32803
+</td>
+<td>
+zhouwl
+</td>
+<td>
+2021-08-12
+</td>
+<td>
+Publish the initial files for myproject
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="环境搭建" class="section level3">
+<h3>环境搭建</h3>
+<pre class="r"><code>library(ggplot2)
+library(ggrepel)
+library(Cairo)</code></pre>
+</div>
+<div id="一准备绘图数据" class="section level3">
+<h3>一、准备绘图数据</h3>
+<div id="数据信息" class="section level5">
+<h5>1. 数据信息</h5>
+<p>该数据框包含必要的两列信息：P值（或校正后p值）和log2FC值。</p>
+<pre class="r"><code>rm(list = ls())
+download.file(&quot;https://cdn.jsdelivr.net/gh/lily123920/figures@main/uPic/degs_t_test%E7%9A%84%E5%89%AF%E6%9C%AC.csv&quot;,
+              destfile = &quot;degs_t_test.csv&quot;)
+degs &lt;- read.csv(&quot;degs_t_test.csv&quot;, header = T)
+degs &lt;- textshape::column_to_rownames(degs)
+
+DEGs &lt;- degs
+DEGs$group &lt;- ifelse(DEGs$avg_log2FC &gt;0, &quot;plaque&quot;, &quot;blood&quot;)
+DEGs$X &lt;- rownames(DEGs)
+head(DEGs)</code></pre>
+<pre><code>              p_val avg_log2FC pct.1 pct.2     p_val_adj  group     X
+CCL5  6.702040e-193   2.714268 0.725 0.120 1.427266e-188 plaque  CCL5
+LDHB  1.418228e-168  -1.585190 0.511 0.924 3.020259e-164  blood  LDHB
+GZMA  4.844229e-168   2.602722 0.687 0.132 1.031627e-163 plaque  GZMA
+LTB   1.843616e-158  -1.476611 0.510 0.921 3.926166e-154  blood   LTB
+EIF3E 5.620325e-144  -1.431147 0.524 0.900 1.196904e-139  blood EIF3E
+NPM1  3.966687e-142  -1.415790 0.649 0.954 8.447456e-138  blood  NPM1</code></pre>
+</div>
+<div id="要添加标签基因信息列表" class="section level5">
+<h5>2. 要添加标签基因信息列表</h5>
+<p>2.1 上调基因的标签信息</p>
+<pre class="r"><code>genes_up &lt;- DEGs[order(DEGs$avg_log2FC, decreasing = T)[1:20],]  # 筛选前20个up基因进行label。
+genelist_up &lt;- genes_up
+head(genelist_up)</code></pre>
+<pre><code>             p_val avg_log2FC pct.1 pct.2     p_val_adj  group    X
+GZMK 1.213795e-140   3.057868 0.591 0.062 2.584897e-136 plaque GZMK
+CCL4 2.983968e-111   2.882129 0.517 0.070 6.354659e-107 plaque CCL4
+CCL5 6.702040e-193   2.714268 0.725 0.120 1.427266e-188 plaque CCL5
+GZMA 4.844229e-168   2.602722 0.687 0.132 1.031627e-163 plaque GZMA
+FOS   1.556888e-70   2.260224 0.455 0.125  3.315548e-66 plaque  FOS
+CST7 6.387518e-118   2.217186 0.591 0.119 1.360286e-113 plaque CST7</code></pre>
+<p>2.2 下调基因的标签信息</p>
+<pre class="r"><code>genes_down &lt;- DEGs[order(DEGs$avg_log2FC, decreasing = F)[1:20],]
+genelist_down &lt;- genes_down
+head(genelist_down)</code></pre>
+<pre><code>              p_val avg_log2FC pct.1 pct.2     p_val_adj group     X
+NOSIP 1.154833e-136  -1.728029 0.272 0.679 2.459333e-132 blood NOSIP
+LDHB  1.418228e-168  -1.585190 0.511 0.924 3.020259e-164 blood  LDHB
+KLF2  2.024142e-132  -1.576768 0.242 0.668 4.310614e-128 blood  KLF2
+LEF1   6.834996e-83  -1.540433 0.098 0.376  1.455581e-78 blood  LEF1
+MAL    3.252383e-78  -1.531449 0.068 0.324  6.926274e-74 blood   MAL
+LTB   1.843616e-158  -1.476611 0.510 0.921 3.926166e-154 blood   LTB</code></pre>
+</div>
+</div>
+<div id="二可视化" class="section level3">
+<h3>二、可视化</h3>
+<ol style="list-style-type: decimal">
+<li>确定配色</li>
+</ol>
+<pre class="r"><code>colors = c(&quot;#ff8c8a&quot;,&quot;#b8bbf8&quot;)</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>确定主题</li>
+</ol>
+<pre class="r"><code>theme_customized &lt;- theme(legend.title = element_text(hjust = 0.55,face = &quot;bold&quot;, colour = &quot;chocolate4&quot;,family = &quot;serif&quot;),
+                          legend.direction = &quot;vertical&quot;,
+                          legend.text = element_text(family = &quot;serif&quot;),
+                          legend.key = element_rect(fill = &quot;aliceblue&quot;),
+                          # legend.position = c(0.04, 0.93),  # 使用的是相对坐标
+                          # 坐标轴刻度
+                          axis.text.x = element_text(family = &quot;serif&quot;, size = 12, vjust = 0.5),
+                          axis.text.y = element_text(family = &quot;serif&quot; ,size = 12),
+                          axis.ticks = element_line(colour = &quot;gray0&quot;, size = 0.9, linetype = &quot;blank&quot;),
+                          #  背景板
+                          panel.grid.minor = element_blank(),
+                          panel.grid.major = element_blank(),
+                          panel.background = element_blank())</code></pre>
+<pre class="r"><code>p &lt;- ggplot(DEGs,aes(x = avg_log2FC,y = -log10(p_val_adj),colour = group)) + 
+  geom_point(aes(color = group),size = 1.2) + 
+  geom_vline(aes(xintercept = 0),color = &quot;grey&quot;)+
+  #theme_customized +
+  scale_color_manual(values = colors,
+                     guide = guide_legend(override.aes = list(label = &quot;&quot;))) 
+    
+p</code></pre>
+<p><img src="figure/vlocanolplot.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>res &lt;- p +
+    # 扩展x的标度，使其两侧有空余位置
+    scale_x_continuous(expand = c(0.22,0.11)) +
+    # 在plot上直接添加text图层，且该text有矩形背景且互repel
+    geom_text_repel(
+      data = genelist_up, # 指定数据来源
+      aes(label = X), # 指定映射的列
+      # 指定字体、大小、颜色
+      size = 3, color = &quot;black&quot;, 
+      force = 2,
+      # nudge_y      = -1,
+      # direction    = &quot;y&quot;,
+      # hjust        = 0,
+      # segment.size = 0.05,
+      # segment.linetype = 6,
+      # max.overlaps = 10,
+      # max.iter = 1000000,
+      # max.time = 10,
+      # xlim  = max(DEGs$avg_log2FC),
+      # min.segment.length = 0,
+      # # 设置字体背景效果 # shadow color # shadow radius
+      # bg.color = &quot;#e0e0e0&quot;, bg.r = 0.15
+    ) +
+    geom_text_repel(
+      data = genelist_down, aes(label = X),
+      size = 3, color = &quot;black&quot;,
+      # force = 2,
+      # nudge_y      = -1,
+      # direction    = &quot;y&quot;,
+      # hjust        = 1,
+      # segment.size = 0.05,
+      # segment.linetype = 6,
+      # max.overlaps = 10,
+      # max.iter = 1000000,
+      # max.time = 10,
+      # xlim  = min(DEGs$avg_log2FC),
+      # min.segment.length = 0,
+      # bg.color = &quot;#e0e0e0&quot;, # shadow color
+      # bg.r = 0.15          # shadow radius
+    ) 
+  
+  res</code></pre>
+<pre><code>Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+increasing max.overlaps</code></pre>
+<p><img src="figure/vlocanolplot.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.1.0 (2021-05-18)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Big Sur 10.16
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRblas.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRlapack.dylib
+
+locale:
+[1] zh_CN.UTF-8/zh_CN.UTF-8/zh_CN.UTF-8/C/zh_CN.UTF-8/zh_CN.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] Cairo_1.5-12.2  ggrepel_0.9.1   ggplot2_3.3.5   workflowr_1.6.2
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.7        highr_0.9         pillar_1.6.2      compiler_4.1.0   
+ [5] bslib_0.2.5.1     later_1.2.0       jquerylib_0.1.4   git2r_0.28.0     
+ [9] tools_4.1.0       digest_0.6.27     jsonlite_1.7.2    evaluate_0.14    
+[13] lifecycle_1.0.0   tibble_3.1.3      gtable_0.3.0      pkgconfig_2.0.3  
+[17] rlang_0.4.11      DBI_1.1.1         yaml_2.2.1        xfun_0.25        
+[21] withr_2.4.2       dplyr_1.0.7       stringr_1.4.0     knitr_1.33       
+[25] generics_0.1.0    fs_1.5.0          vctrs_0.3.8       sass_0.4.0       
+[29] tidyselect_1.1.1  rprojroot_2.0.2   grid_4.1.0        data.table_1.14.0
+[33] glue_1.4.2        R6_2.5.0          fansi_0.5.0       rmarkdown_2.10   
+[37] farver_2.1.0      purrr_0.3.4       magrittr_2.0.1    whisker_0.4      
+[41] scales_1.1.1      promises_1.2.0.1  ellipsis_0.3.2    htmltools_0.5.1.1
+[45] assertthat_0.2.1  textshape_1.7.3   colorspace_2.0-2  httpuv_1.6.1     
+[49] labeling_0.4.2    utf8_1.2.2        stringi_1.7.3     munsell_0.5.0    
+[53] crayon_1.4.1     </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

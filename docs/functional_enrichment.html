@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Wenli Zhou" />
+
+
+<title>富集分析可视化</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/sandstone.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">小试牛刀之可视化</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/lily123920/小试牛刀之可视化">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">富集分析可视化</h1>
+<h4 class="author">Wenli Zhou</h4>
+<h4 class="date">8-12-2021</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2021-08-12
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>myproject/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20210812code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20210812)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20210812code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20210812)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrong9b32803"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> 9b32803 </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrong9b32803" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version 9b32803. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+
+Untracked files:
+    Untracked:  genes_up_GO.RData
+
+Unstaged changes:
+    Modified:   analysis/_site.yml
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/functional_enrichment.Rmd</code>) and HTML (<code>docs/functional_enrichment.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+9b32803
+</td>
+<td>
+zhouwl
+</td>
+<td>
+2021-08-12
+</td>
+<td>
+Publish the initial files for myproject
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>该教程是将上调基因和下调基因分别进行富集分析。</p>
+<div id="环境搭建" class="section level3">
+<h3>环境搭建</h3>
+<pre class="r"><code>library(ggplot2)
+library(org.Hs.eg.db)
+library(clusterProfiler)</code></pre>
+</div>
+<div id="一准备数据" class="section level3">
+<h3>一、准备数据</h3>
+<div id="导入所有的潜在的差异基因" class="section level5">
+<h5>1. 导入所有的潜在的差异基因</h5>
+<pre class="r"><code>rm(list = ls())
+download.file(&quot;https://cdn.jsdelivr.net/gh/lily123920/figures@main/uPic/degs_t_test%E7%9A%84%E5%89%AF%E6%9C%AC.csv&quot;,
+              destfile = &quot;degs_t_test.csv&quot;)
+degs &lt;- read.csv(&quot;degs_t_test.csv&quot;, header = T)
+degs &lt;- textshape::column_to_rownames(degs)
+head(degs)</code></pre>
+<pre><code>              p_val avg_log2FC pct.1 pct.2     p_val_adj
+CCL5  6.702040e-193   2.714268 0.725 0.120 1.427266e-188
+LDHB  1.418228e-168  -1.585190 0.511 0.924 3.020259e-164
+GZMA  4.844229e-168   2.602722 0.687 0.132 1.031627e-163
+LTB   1.843616e-158  -1.476611 0.510 0.921 3.926166e-154
+EIF3E 5.620325e-144  -1.431147 0.524 0.900 1.196904e-139
+NPM1  3.966687e-142  -1.415790 0.649 0.954 8.447456e-138</code></pre>
+</div>
+<div id="根据阈值筛选degs" class="section level5">
+<h5>2. 根据阈值筛选DEGs</h5>
+<p>不同阈值筛选的DEGs的个数是不同的。 首先，确定阈值，筛选到合适个数的DEGs; 然后，确定下调和上调基因。。。 这里，up为疾病组上调，命名为genes_up; down为对照组相对上调，命名为genes_down.</p>
+<pre class="r"><code>p_val_adj &lt;- 0.05
+degs_q &lt;- degs[degs$p_val_adj &lt; p_val_adj,]   
+genes_up &lt;- rownames(degs_q)[degs_q$avg_log2FC &gt; 0] 
+genes_down &lt;- rownames(degs_q)[degs_q$avg_log2FC &lt; 0] 
+genes_up[1:4]; genes_down[1:4]</code></pre>
+<pre><code>[1] &quot;CCL5&quot; &quot;GZMA&quot; &quot;GZMK&quot; &quot;CST7&quot;</code></pre>
+<pre><code>[1] &quot;LDHB&quot;  &quot;LTB&quot;   &quot;EIF3E&quot; &quot;NPM1&quot; </code></pre>
+<p>小结：进行KEGG和GO富集分析，只需要得到基因集列表（不需要任何和表达相关的信息）即可。</p>
+</div>
+<div id="id转化" class="section level5">
+<h5>3. ID转化</h5>
+<p>得到基因名称列表后，需要将其转换成entrezID才可以。</p>
+<pre class="r"><code>library(org.Hs.eg.db)
+library(clusterProfiler)
+entrezid_up &lt;- bitr(genes_up, &quot;SYMBOL&quot;, &quot;ENTREZID&quot;, &quot;org.Hs.eg.db&quot;)</code></pre>
+<pre><code>Warning in bitr(genes_up, &quot;SYMBOL&quot;, &quot;ENTREZID&quot;, &quot;org.Hs.eg.db&quot;): 4.42% of input
+gene IDs are fail to map...</code></pre>
+<pre class="r"><code>entrezid_down &lt;- bitr(genes_down, &quot;SYMBOL&quot;, &quot;ENTREZID&quot;, &quot;org.Hs.eg.db&quot;)</code></pre>
+<pre><code>Warning in bitr(genes_down, &quot;SYMBOL&quot;, &quot;ENTREZID&quot;, &quot;org.Hs.eg.db&quot;): 7.78% of
+input gene IDs are fail to map...</code></pre>
+<pre class="r"><code>entrez_up &lt;- entrezid_up$ENTREZID
+entrez_down &lt;- entrezid_down$ENTREZID
+#entrezList &lt;- list(entrez_pbmc, entrez_pla)</code></pre>
+<pre class="r"><code>entrez_up[1:4];entrez_down[1:4]</code></pre>
+<pre><code>[1] &quot;6352&quot; &quot;3001&quot; &quot;3003&quot; &quot;8530&quot;</code></pre>
+<pre><code>[1] &quot;3945&quot; &quot;4050&quot; &quot;3646&quot; &quot;4869&quot;</code></pre>
+</div>
+</div>
+<div id="二go富集分析" class="section level3">
+<h3>二、GO富集分析</h3>
+<p>GO富集分析的本质是超几何检验。。。 影响GO富集分析结果的输入包括：使用的数据库。</p>
+<pre class="r"><code># GO &lt;- enrichGO(
+#   entrez_up, keyType = &quot;ENTREZID&quot;,
+#   OrgDb=&#39;org.Hs.eg.db&#39;, 
+#   ont = &quot;ALL&quot;, # 使用哪个条目进行注释，GO数据库有三个条目，分别是MF,BP,CC.
+#   pvalueCutoff = 0.05,
+#   pAdjustMethod = &quot;BH&quot;, qvalueCutoff = 0.2,
+#   #universe,
+#   #minGSSize = 10,maxGSSize = 500,
+#   readable = TRUE, # 输出结果中会直接将ENTREZID转换为SYMBOL
+#   pool = FALSE
+# )
+# save(GO, file = &quot;genes_up_GO.RData&quot;)
+download.file(&quot;https://cdn.jsdelivr.net/gh/lily123920/figures@main/uPic/genes_up_GO.RData&quot;, destfile = &quot;genes_up_GO.RData&quot;)
+load(&quot;genes_up_GO.RData&quot;)</code></pre>
+</div>
+<div id="三富集分析结果可视化" class="section level3">
+<h3>三、富集分析结果可视化</h3>
+<div id="dotplot图" class="section level5">
+<h5>1. dotplot图</h5>
+<pre class="r"><code># 确定配色
+color = rep(c(&quot;red&quot;,&quot;black&quot;),15)
+# 确定美学主题
+theme_customized = theme(plot.margin = unit(c(3, 3, 10, 3), &quot;mm&quot;),
+                plot.title = element_text(hjust = 0.5, face = &quot;bold&quot;),
+                axis.text.x = element_text(angle = -90,hjust = 0,vjust = 0.5,
+                                     color = color,
+                                     face = &quot;bold&quot;))</code></pre>
+<pre><code>Warning: Vectorized input to `element_text()` is not officially supported.
+Results may be unexpected or may change in future versions of ggplot2.</code></pre>
+<pre class="r"><code># 开始绘图
+dot_GO &lt;- dotplot(GO,x=&quot;GeneRatio&quot;,showCategory=10,
+                    font.size=12,title=&quot;GO enrichment&quot;,
+                    split = &quot;ONTOLOGY&quot; ) + coord_flip() +
+          facet_grid(cols = vars(ONTOLOGY), scale=&quot;free&quot;) + 
+          scale_y_discrete(labels=function(y) stringr::str_wrap(y,width=36)) +
+          theme_customized</code></pre>
+<pre><code>Scale for &#39;y&#39; is already present. Adding another scale for &#39;y&#39;, which will
+replace the existing scale.</code></pre>
+<pre class="r"><code>dot_GO</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/functional_enrichment.Rmd/unnamed-chunk-6-1.png" alt="相同的颜色总是对应相同的数值" width="960" />
+<p class="caption">
+相同的颜色总是对应相同的数值
+</p>
+</div>
+</div>
+<div id="cne图" class="section level5">
+<h5>2. cne图</h5>
+<p>这张图主要是看通路之间交集的基因。。。。 如果一些基因介导了多条被富集到的通路，那么该基因可能会存在潜在的生物学效应。</p>
+<pre class="r"><code>library(ggnewscale)
+cne_GO &lt;- cnetplot(GO, foldChange=genes_up, categorySize=&quot;pvalue&quot;,
+                     showCategory = 3, colorEdge = TRUE)
+cne_GO</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/functional_enrichment.Rmd/unnamed-chunk-7-1.png" alt="相同的颜色总是对应相同的数值" width="960" />
+<p class="caption">
+相同的颜色总是对应相同的数值
+</p>
+</div>
+</div>
+<div id="热图" class="section level5">
+<h5>3. 热图</h5>
+<p>这个图的作用同前，主要是为了chec基因在富集到的通路中出现的频次。</p>
+<pre class="r"><code>heat_GO &lt;- heatplot(GO) + coord_flip()
+heat_GO</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/functional_enrichment.Rmd/unnamed-chunk-8-1.png" alt="相同的颜色总是对应相同的数值" width="960" />
+<p class="caption">
+相同的颜色总是对应相同的数值
+</p>
+</div>
+</div>
+<div id="统计每个基因出现的频次并绘图" class="section level5">
+<h5>4. 统计每个基因出现的频次，并绘图</h5>
+<pre class="r"><code>my_data &lt;- GO@result[GO@result$Count &gt;= 20,]
+genelist &lt;- my_data$geneID %&gt;% 
+  stringr::str_split(., &quot;/&quot;) %&gt;%
+  unlist() %&gt;%
+  table() %&gt;%
+  as.data.frame() 
+genelist &lt;- genelist[order(genelist$Freq,decreasing = T),]
+head(genelist)</code></pre>
+<pre><code>          . Freq
+54 HLA-DRB1   28
+53  HLA-DRA   24
+20     CD74   23
+1     ADAM8   21
+3     ANXA1   20
+14    CD160   20</code></pre>
+<pre class="r"><code>colnames(genelist) &lt;- c(&quot;gene&quot;,&quot;Freq&quot;)
+
+genelist$gene1 &lt;- factor(genelist$gene, levels = genelist$gene)
+str(genelist)</code></pre>
+<pre><code>&#39;data.frame&#39;:   109 obs. of  3 variables:
+ $ gene : Factor w/ 109 levels &quot;ADAM8&quot;,&quot;AKNA&quot;,..: 54 53 20 1 3 14 25 65 106 21 ...
+ $ Freq : int  28 24 23 21 20 20 19 19 19 18 ...
+ $ gene1: Factor w/ 109 levels &quot;HLA-DRB1&quot;,&quot;HLA-DRA&quot;,..: 1 2 3 4 5 6 7 8 9 10 ...</code></pre>
+<pre class="r"><code>  p &lt;- ggplot(genelist[1:30,], aes(x = gene1, y = Freq )) +
+    geom_bar(stat = &quot;identity&quot;) +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, face = &quot;bold&quot;),
+          axis.title.y  = element_text( face = &quot;bold&quot;),
+          axis.text.y  = element_text( face = &quot;bold&quot;)) 
+  p</code></pre>
+<p><img src="figure/functional_enrichment.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="四kegg富集分析" class="section level3">
+<h3>四、KEGG富集分析</h3>
+<pre class="r"><code>kegg &lt;- enrichKEGG(
+  entrez_up, keyType = &quot;kegg&quot;,
+  organism = &quot;hsa&quot;,
+  pvalueCutoff = 0.05, pAdjustMethod = &quot;BH&quot;, qvalueCutoff = 0.2,
+  # universe,
+  minGSSize = 10,maxGSSize = 500,
+  use_internal_data = FALSE
+)</code></pre>
+<pre><code>Reading KEGG annotation online:
+
+Reading KEGG annotation online:</code></pre>
+<pre class="r"><code>kegg</code></pre>
+<pre><code>#
+# over-representation test
+#
+#...@organism    hsa 
+#...@ontology    KEGG 
+#...@keytype     kegg 
+#...@gene    chr [1:238] &quot;6352&quot; &quot;3001&quot; &quot;3003&quot; &quot;8530&quot; &quot;6351&quot; &quot;4818&quot; &quot;2353&quot; &quot;5552&quot; &quot;5996&quot; ...
+#...pvalues adjusted by &#39;BH&#39; with cutoff &lt;0.05 
+#...53 enriched terms found
+&#39;data.frame&#39;:   53 obs. of  9 variables:
+ $ ID         : chr  &quot;hsa05332&quot; &quot;hsa04612&quot; &quot;hsa05330&quot; &quot;hsa04940&quot; ...
+ $ Description: chr  &quot;Graft-versus-host disease&quot; &quot;Antigen processing and presentation&quot; &quot;Allograft rejection&quot; &quot;Type I diabetes mellitus&quot; ...
+ $ GeneRatio  : chr  &quot;16/133&quot; &quot;19/133&quot; &quot;14/133&quot; &quot;14/133&quot; ...
+ $ BgRatio    : chr  &quot;42/8096&quot; &quot;78/8096&quot; &quot;38/8096&quot; &quot;43/8096&quot; ...
+ $ pvalue     : num  1.30e-18 9.98e-18 3.60e-16 2.72e-15 6.60e-14 ...
+ $ p.adjust   : num  2.82e-16 1.08e-15 2.60e-14 1.48e-13 2.86e-12 ...
+ $ qvalue     : num  2.11e-16 8.09e-16 1.95e-14 1.10e-13 2.14e-12 ...
+ $ geneID     : chr  &quot;3824/5551/3123/3113/3127/3115/3122/3117/3821/3119/3108/3002/3109/7124/3106/3107&quot; &quot;925/972/3824/3123/3113/3127/3115/926/3304/3122/3117/3821/3119/3108/3109/7124/3303/3106/3107&quot; &quot;5551/3123/3113/3127/3115/3122/3117/3119/3108/3002/3109/7124/3106/3107&quot; &quot;5551/3123/3113/3127/3115/3122/3117/3119/3108/3002/3109/7124/3106/3107&quot; ...
+ $ Count      : int  16 19 14 14 16 17 14 11 13 19 ...
+#...Citation
+  Guangchuang Yu, Li-Gen Wang, Yanyan Han and Qing-Yu He.
+  clusterProfiler: an R package for comparing biological themes among
+  gene clusters. OMICS: A Journal of Integrative Biology
+  2012, 16(5):284-287 </code></pre>
+</div>
+<div id="五kegg可视化" class="section level3">
+<h3>五、KEGG可视化</h3>
+<ol style="list-style-type: decimal">
+<li>barplot图</li>
+</ol>
+<pre class="r"><code># 确定配色
+
+# 确定主题
+theme_customized &lt;- theme(
+                          axis.text.y = element_blank(),
+                          axis.ticks.y = element_blank(),
+                          plot.title = element_text(hjust = 0.5, face = &quot;bold&quot;))
+# 开始绘图
+barplot_kegg &lt;- graphics::barplot(kegg, 
+          drop = FALSE, 
+          showCategory = 20, 
+          title = &quot;KEGG enrichment analysis&quot;,
+          font.size = 8) + 
+    geom_text(aes(label = Description),x=0,hjust=0)+
+    theme_customized
+barplot_kegg</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/functional_enrichment.Rmd/unnamed-chunk-12-1.png" alt="相同的颜色总是对应相同的数值" width="960" />
+<p class="caption">
+相同的颜色总是对应相同的数值
+</p>
+</div>
+<ol start="2" style="list-style-type: decimal">
+<li>dotplot图</li>
+</ol>
+<pre class="r"><code># 确定配色
+# 确定主题
+theme_customized &lt;- theme(plot.margin = unit(c(3, 3, 10, 3), &quot;mm&quot;),
+                          plot.title = element_text(hjust = 0.5, face = &quot;bold&quot;),
+                          axis.text.y = element_text(angle = 0,hjust = 0,vjust = 0,
+                                                     color = rep(c(&quot;red&quot;,&quot;black&quot;),15),
+                                                    face = &quot;bold&quot;))</code></pre>
+<pre><code>Warning: Vectorized input to `element_text()` is not officially supported.
+Results may be unexpected or may change in future versions of ggplot2.</code></pre>
+<pre class="r"><code>dot_kegg &lt;- dotplot(kegg,x=&quot;GeneRatio&quot;,showCategory=20,
+                    font.size=12,title=&quot;kegg enrichment&quot;) + 
+  theme_customized + 
+  scale_y_discrete(labels=function(y) stringr::str_wrap(y,width=36)) # 折叠纵坐标</code></pre>
+<pre><code>Scale for &#39;y&#39; is already present. Adding another scale for &#39;y&#39;, which will
+replace the existing scale.</code></pre>
+<pre class="r"><code>dot_kegg</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/functional_enrichment.Rmd/unnamed-chunk-13-1.png" alt="相同的颜色总是对应相同的数值" width="960" />
+<p class="caption">
+相同的颜色总是对应相同的数值
+</p>
+</div>
+<p>完结。。。 对于富集结果信息的挖掘，需要注意一点：上调基因和下调基因可能会富集到同一条通路哦。。。 这时候结果该怎么解读呢？其实同一条通路中的不同基因也会介导不同的功能的。 不管是KEGG还是GO富集分析，研究者所关注的是这些基因的功能。 富集分析的终点是对这些差异基因功能解读。 如何解读呢？ ①富集到某条通路，说明这条通路相关的功能确实是和该疾病状态相关的。 毕竟不同的疾病的DEGs富集到的通路是不同的。 ②一条通路中涉及的基因是有可能起着不同的作用的。。。所以下一步要筛选 感兴趣的通路，然后check富集到这些通路的基因具体起着什么样的作用。</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.1.0 (2021-05-18)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Big Sur 10.16
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRblas.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRlapack.dylib
+
+locale:
+[1] zh_CN.UTF-8/zh_CN.UTF-8/zh_CN.UTF-8/C/zh_CN.UTF-8/zh_CN.UTF-8
+
+attached base packages:
+[1] parallel  stats4    stats     graphics  grDevices utils     datasets 
+[8] methods   base     
+
+other attached packages:
+ [1] ggnewscale_0.4.5      clusterProfiler_4.0.2 org.Hs.eg.db_3.13.0  
+ [4] AnnotationDbi_1.54.1  IRanges_2.26.0        S4Vectors_0.30.0     
+ [7] Biobase_2.52.0        BiocGenerics_0.38.0   ggplot2_3.3.5        
+[10] workflowr_1.6.2      
+
+loaded via a namespace (and not attached):
+  [1] fgsea_1.18.0           colorspace_2.0-2       ggtree_3.0.2          
+  [4] ellipsis_0.3.2         rprojroot_2.0.2        qvalue_2.24.0         
+  [7] XVector_0.32.0         fs_1.5.0               aplot_0.0.6           
+ [10] farver_2.1.0           graphlayouts_0.7.1     ggrepel_0.9.1         
+ [13] bit64_4.0.5            scatterpie_0.1.6       fansi_0.5.0           
+ [16] splines_4.1.0          cachem_1.0.5           GOSemSim_2.18.1       
+ [19] knitr_1.33             polyclip_1.10-0        jsonlite_1.7.2        
+ [22] GO.db_3.13.0           png_0.1-7              ggforce_0.3.3         
+ [25] BiocManager_1.30.16    compiler_4.1.0         httr_1.4.2            
+ [28] rvcheck_0.1.8          assertthat_0.2.1       Matrix_1.3-4          
+ [31] fastmap_1.1.0          lazyeval_0.2.2         later_1.2.0           
+ [34] tweenr_1.0.2           htmltools_0.5.1.1      tools_4.1.0           
+ [37] igraph_1.2.6           gtable_0.3.0           glue_1.4.2            
+ [40] GenomeInfoDbData_1.2.6 reshape2_1.4.4         DO.db_2.9             
+ [43] dplyr_1.0.7            fastmatch_1.1-3        Rcpp_1.0.7            
+ [46] enrichplot_1.12.2      jquerylib_0.1.4        vctrs_0.3.8           
+ [49] Biostrings_2.60.2      ape_5.5                nlme_3.1-152          
+ [52] ggraph_2.0.5           xfun_0.25              stringr_1.4.0         
+ [55] lifecycle_1.0.0        DOSE_3.18.1            zlibbioc_1.38.0       
+ [58] MASS_7.3-54            scales_1.1.1           tidygraph_1.2.0       
+ [61] promises_1.2.0.1       RColorBrewer_1.1-2     yaml_2.2.1            
+ [64] memoise_2.0.0          gridExtra_2.3          downloader_0.4        
+ [67] sass_0.4.0             stringi_1.7.3          RSQLite_2.2.7         
+ [70] highr_0.9              tidytree_0.3.4         BiocParallel_1.26.1   
+ [73] GenomeInfoDb_1.28.1    rlang_0.4.11           pkgconfig_2.0.3       
+ [76] bitops_1.0-7           evaluate_0.14          lattice_0.20-44       
+ [79] purrr_0.3.4            labeling_0.4.2         treeio_1.16.1         
+ [82] patchwork_1.1.1        shadowtext_0.0.8       cowplot_1.1.1         
+ [85] bit_4.0.4              tidyselect_1.1.1       plyr_1.8.6            
+ [88] magrittr_2.0.1         R6_2.5.0               generics_0.1.0        
+ [91] DBI_1.1.1              pillar_1.6.2           whisker_0.4           
+ [94] withr_2.4.2            KEGGREST_1.32.0        RCurl_1.98-1.3        
+ [97] textshape_1.7.3        tibble_3.1.3           crayon_1.4.1          
+[100] utf8_1.2.2             rmarkdown_2.10         viridis_0.6.1         
+[103] grid_4.1.0             data.table_1.14.0      blob_1.2.2            
+[106] git2r_0.28.0           digest_0.6.27          tidyr_1.1.3           
+[109] httpuv_1.6.1           munsell_0.5.0          viridisLite_0.4.0     
+[112] bslib_0.2.5.1         </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
