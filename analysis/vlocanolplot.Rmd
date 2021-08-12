@@ -1,0 +1,137 @@
+---
+title: "好看的火山图"
+author: "Wenli Zhou"
+date: '`r format(Sys.Date(), "%b-%d-%Y")`'
+output:  
+  html_document: 
+    toc: yes
+    toc_float:
+      collapse: yes
+      smooth_scroll: yes
+      number_sections: yes
+      highlight: monochrome
+    theme: journal
+    highlight: textmate
+    fig_caption: yes
+editor_options:  
+  chunk_output_type: console
+---
+### 环境搭建
+```{r, message=FALSE}
+library(ggplot2)
+library(ggrepel)
+library(Cairo)
+```
+
+### 一、准备绘图数据
+##### 1. 数据信息
+该数据框包含必要的两列信息：P值（或校正后p值）和log2FC值。
+```{r}
+rm(list = ls())
+download.file("https://cdn.jsdelivr.net/gh/lily123920/figures@main/uPic/degs_t_test%E7%9A%84%E5%89%AF%E6%9C%AC.csv",
+              destfile = "degs_t_test.csv")
+degs <- read.csv("degs_t_test.csv", header = T)
+degs <- textshape::column_to_rownames(degs)
+
+DEGs <- degs
+DEGs$group <- ifelse(DEGs$avg_log2FC >0, "plaque", "blood")
+DEGs$X <- rownames(DEGs)
+head(DEGs)
+```
+##### 2. 要添加标签基因信息列表
+2.1 上调基因的标签信息
+```{r}
+genes_up <- DEGs[order(DEGs$avg_log2FC, decreasing = T)[1:20],]  # 筛选前20个up基因进行label。
+genelist_up <- genes_up
+head(genelist_up)
+```
+2.2 下调基因的标签信息
+```{r}
+genes_down <- DEGs[order(DEGs$avg_log2FC, decreasing = F)[1:20],]
+genelist_down <- genes_down
+head(genelist_down)
+```
+
+### 二、可视化
+
+1. 确定配色
+```{r}
+colors = c("#ff8c8a","#b8bbf8")
+```
+
+2. 确定主题
+```{r}
+theme_customized <- theme(legend.title = element_text(hjust = 0.55,face = "bold", colour = "chocolate4",family = "serif"),
+                          legend.direction = "vertical",
+                          legend.text = element_text(family = "serif"),
+                          legend.key = element_rect(fill = "aliceblue"),
+                          # legend.position = c(0.04, 0.93),  # 使用的是相对坐标
+                          # 坐标轴刻度
+                          axis.text.x = element_text(family = "serif", size = 12, vjust = 0.5),
+                          axis.text.y = element_text(family = "serif" ,size = 12),
+                          axis.ticks = element_line(colour = "gray0", size = 0.9, linetype = "blank"),
+                          #  背景板
+                          panel.grid.minor = element_blank(),
+                          panel.grid.major = element_blank(),
+                          panel.background = element_blank())
+```
+
+
+```{r}
+p <- ggplot(DEGs,aes(x = avg_log2FC,y = -log10(p_val_adj),colour = group)) + 
+  geom_point(aes(color = group),size = 1.2) + 
+  geom_vline(aes(xintercept = 0),color = "grey")+
+  #theme_customized +
+  scale_color_manual(values = colors,
+                     guide = guide_legend(override.aes = list(label = ""))) 
+    
+p
+```
+
+```{r}
+res <- p +
+    # 扩展x的标度，使其两侧有空余位置
+    scale_x_continuous(expand = c(0.22,0.11)) +
+    # 在plot上直接添加text图层，且该text有矩形背景且互repel
+    geom_text_repel(
+      data = genelist_up, # 指定数据来源
+      aes(label = X), # 指定映射的列
+      # 指定字体、大小、颜色
+      size = 3, color = "black", 
+      force = 2,
+      # nudge_y      = -1,
+      # direction    = "y",
+      # hjust        = 0,
+      # segment.size = 0.05,
+      # segment.linetype = 6,
+      # max.overlaps = 10,
+      # max.iter = 1000000,
+      # max.time = 10,
+      # xlim  = max(DEGs$avg_log2FC),
+      # min.segment.length = 0,
+      # # 设置字体背景效果 # shadow color # shadow radius
+      # bg.color = "#e0e0e0", bg.r = 0.15
+    ) +
+    geom_text_repel(
+      data = genelist_down, aes(label = X),
+      size = 3, color = "black",
+      # force = 2,
+      # nudge_y      = -1,
+      # direction    = "y",
+      # hjust        = 1,
+      # segment.size = 0.05,
+      # segment.linetype = 6,
+      # max.overlaps = 10,
+      # max.iter = 1000000,
+      # max.time = 10,
+      # xlim  = min(DEGs$avg_log2FC),
+      # min.segment.length = 0,
+      # bg.color = "#e0e0e0", # shadow color
+      # bg.r = 0.15          # shadow radius
+    ) 
+  
+  res
+```
+
+
+

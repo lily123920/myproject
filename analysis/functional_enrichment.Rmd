@@ -1,0 +1,230 @@
+---
+title: "富集分析可视化"
+author: "Wenli Zhou"
+date: '`r format(Sys.Date(), "%b-%d-%Y")`'
+output:  
+  html_document: 
+    toc: yes
+    toc_float:
+      collapse: yes
+      smooth_scroll: yes
+      number_sections: yes
+      highlight: monochrome
+    theme: journal
+    highlight: textmate
+    fig_caption: yes
+editor_options:  
+  chunk_output_type: console 
+---
+
+该教程是将上调基因和下调基因分别进行富集分析。 
+
+### 环境搭建
+
+```{r message=FALSE}
+library(ggplot2)
+library(org.Hs.eg.db)
+library(clusterProfiler)
+```
+
+### 一、准备数据
+##### 1. 导入所有的潜在的差异基因
+
+```{r setup, message=FALSE}
+rm(list = ls())
+download.file("https://cdn.jsdelivr.net/gh/lily123920/figures@main/uPic/degs_t_test%E7%9A%84%E5%89%AF%E6%9C%AC.csv",
+              destfile = "degs_t_test.csv")
+degs <- read.csv("degs_t_test.csv", header = T)
+degs <- textshape::column_to_rownames(degs)
+head(degs)
+```
+
+##### 2. 根据阈值筛选DEGs
+
+不同阈值筛选的DEGs的个数是不同的。 首先，确定阈值，筛选到合适个数的DEGs;
+然后，确定下调和上调基因。。。 这里，up为疾病组上调，命名为genes_up;
+down为对照组相对上调，命名为genes_down.
+
+```{r}
+p_val_adj <- 0.05
+degs_q <- degs[degs$p_val_adj < p_val_adj,]   
+genes_up <- rownames(degs_q)[degs_q$avg_log2FC > 0] 
+genes_down <- rownames(degs_q)[degs_q$avg_log2FC < 0] 
+genes_up[1:4]; genes_down[1:4]
+```
+
+小结：进行KEGG和GO富集分析，只需要得到基因集列表（不需要任何和表达相关的信息）即可。
+
+##### 3. ID转化
+
+得到基因名称列表后，需要将其转换成entrezID才可以。
+
+```{r, message=FALSE}
+library(org.Hs.eg.db)
+library(clusterProfiler)
+entrezid_up <- bitr(genes_up, "SYMBOL", "ENTREZID", "org.Hs.eg.db")
+entrezid_down <- bitr(genes_down, "SYMBOL", "ENTREZID", "org.Hs.eg.db")
+entrez_up <- entrezid_up$ENTREZID
+entrez_down <- entrezid_down$ENTREZID
+#entrezList <- list(entrez_pbmc, entrez_pla)
+```
+```{r}
+entrez_up[1:4];entrez_down[1:4]
+```
+
+### 二、GO富集分析
+
+GO富集分析的本质是超几何检验。。。
+影响GO富集分析结果的输入包括：使用的数据库。
+
+```{r}
+# GO <- enrichGO(
+#   entrez_up, keyType = "ENTREZID",
+#   OrgDb='org.Hs.eg.db', 
+#   ont = "ALL", # 使用哪个条目进行注释，GO数据库有三个条目，分别是MF,BP,CC.
+#   pvalueCutoff = 0.05,
+#   pAdjustMethod = "BH", qvalueCutoff = 0.2,
+#   #universe,
+#   #minGSSize = 10,maxGSSize = 500,
+#   readable = TRUE, # 输出结果中会直接将ENTREZID转换为SYMBOL
+#   pool = FALSE
+# )
+# save(GO, file = "genes_up_GO.RData")
+download.file("https://cdn.jsdelivr.net/gh/lily123920/figures@main/uPic/genes_up_GO.RData", destfile = "genes_up_GO.RData")
+load("genes_up_GO.RData")
+```
+
+### 三、富集分析结果可视化
+
+##### 1. dotplot图
+
+```{r, fig.align='center', fig.width=10, fig.height=6, fig.fullwidth=TRUE, fig.cap='相同的颜色总是对应相同的数值'}
+# 确定配色
+color = rep(c("red","black"),15)
+# 确定美学主题
+theme_customized = theme(plot.margin = unit(c(3, 3, 10, 3), "mm"),
+                plot.title = element_text(hjust = 0.5, face = "bold"),
+                axis.text.x = element_text(angle = -90,hjust = 0,vjust = 0.5,
+                                     color = color,
+                                     face = "bold"))
+# 开始绘图
+dot_GO <- dotplot(GO,x="GeneRatio",showCategory=10,
+                    font.size=12,title="GO enrichment",
+                    split = "ONTOLOGY" ) + coord_flip() +
+          facet_grid(cols = vars(ONTOLOGY), scale="free") + 
+          scale_y_discrete(labels=function(y) stringr::str_wrap(y,width=36)) +
+          theme_customized
+dot_GO
+```
+
+##### 2. cne图
+
+这张图主要是看通路之间交集的基因。。。。
+如果一些基因介导了多条被富集到的通路，那么该基因可能会存在潜在的生物学效应。
+
+```{r, fig.align='center', fig.width=10, fig.height=6, fig.fullwidth=TRUE, fig.cap='相同的颜色总是对应相同的数值'}
+library(ggnewscale)
+cne_GO <- cnetplot(GO, foldChange=genes_up, categorySize="pvalue",
+                     showCategory = 3, colorEdge = TRUE)
+cne_GO
+```
+
+##### 3. 热图
+
+这个图的作用同前，主要是为了chec基因在富集到的通路中出现的频次。
+
+```{r, fig.align='center', fig.width=10, fig.height=12, fig.fullwidth=TRUE, fig.cap='相同的颜色总是对应相同的数值'}
+heat_GO <- heatplot(GO) + coord_flip()
+heat_GO
+```
+
+##### 4. 统计每个基因出现的频次，并绘图
+
+```{r}
+my_data <- GO@result[GO@result$Count >= 20,]
+genelist <- my_data$geneID %>% 
+  stringr::str_split(., "/") %>%
+  unlist() %>%
+  table() %>%
+  as.data.frame() 
+genelist <- genelist[order(genelist$Freq,decreasing = T),]
+head(genelist)
+colnames(genelist) <- c("gene","Freq")
+
+genelist$gene1 <- factor(genelist$gene, levels = genelist$gene)
+str(genelist)
+```
+
+```{r}
+  p <- ggplot(genelist[1:30,], aes(x = gene1, y = Freq )) +
+    geom_bar(stat = "identity") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"),
+          axis.title.y  = element_text( face = "bold"),
+          axis.text.y  = element_text( face = "bold")) 
+  p
+```
+
+### 四、KEGG富集分析
+
+```{r}
+kegg <- enrichKEGG(
+  entrez_up, keyType = "kegg",
+  organism = "hsa",
+  pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2,
+  # universe,
+  minGSSize = 10,maxGSSize = 500,
+  use_internal_data = FALSE
+)
+kegg
+```
+
+### 五、KEGG可视化
+
+1.  barplot图
+
+```{r, fig.align='center', fig.width=10, fig.height=6, fig.fullwidth=TRUE, fig.cap='相同的颜色总是对应相同的数值'}
+# 确定配色
+
+# 确定主题
+theme_customized <- theme(
+                          axis.text.y = element_blank(),
+                          axis.ticks.y = element_blank(),
+                          plot.title = element_text(hjust = 0.5, face = "bold"))
+# 开始绘图
+barplot_kegg <- graphics::barplot(kegg, 
+          drop = FALSE, 
+          showCategory = 20, 
+          title = "KEGG enrichment analysis",
+          font.size = 8) + 
+    geom_text(aes(label = Description),x=0,hjust=0)+
+    theme_customized
+barplot_kegg
+```
+
+2.  dotplot图
+
+```{r, fig.align='center', fig.width=10, fig.height=6, fig.fullwidth=TRUE, fig.cap='相同的颜色总是对应相同的数值'}
+# 确定配色
+# 确定主题
+theme_customized <- theme(plot.margin = unit(c(3, 3, 10, 3), "mm"),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          axis.text.y = element_text(angle = 0,hjust = 0,vjust = 0,
+                                                     color = rep(c("red","black"),15),
+                                                    face = "bold"))
+dot_kegg <- dotplot(kegg,x="GeneRatio",showCategory=20,
+                    font.size=12,title="kegg enrichment") + 
+  theme_customized + 
+  scale_y_discrete(labels=function(y) stringr::str_wrap(y,width=36)) # 折叠纵坐标
+dot_kegg
+```
+
+完结。。。
+对于富集结果信息的挖掘，需要注意一点：上调基因和下调基因可能会富集到同一条通路哦。。。
+这时候结果该怎么解读呢？其实同一条通路中的不同基因也会介导不同的功能的。
+不管是KEGG还是GO富集分析，研究者所关注的是这些基因的功能。
+富集分析的终点是对这些差异基因功能解读。 如何解读呢？
+①富集到某条通路，说明这条通路相关的功能确实是和该疾病状态相关的。
+毕竟不同的疾病的DEGs富集到的通路是不同的。
+②一条通路中涉及的基因是有可能起着不同的作用的。。。所以下一步要筛选
+感兴趣的通路，然后check富集到这些通路的基因具体起着什么样的作用。
