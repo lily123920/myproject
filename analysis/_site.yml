@@ -1,7 +1,7 @@
-name: "myproject"
+name: "小试牛刀之可视化"
 output_dir: ../docs
 navbar:
-  title: "myproject"
+  title: "小试牛刀之可视化"
   left:
   - text: Home
     href: index.html
@@ -9,9 +9,13 @@ navbar:
     href: about.html
   - text: License
     href: license.html
+  right:
+  - icon: fa-github
+    text: Source code
+    href: https://github.com/lily123920/小试牛刀之可视化
 output:
   workflowr::wflow_html:
     toc: yes
     toc_float: yes
-    theme: cosmo
+    theme: sandstone
     highlight: textmate
